@@ -39,6 +39,27 @@ class ProductRepository extends ServiceEntityRepository
         }
     }
 
+    public function findAllGreaterThanPrice(int $price, bool $includeUnavailableProducts = false): array
+    {
+        // automatically knows to select Products
+        // the "p" is an alias you'll use in the rest of the query
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.price > :price')
+            ->setParameter('price', $price)
+            ->orderBy('p.price', 'ASC');
+
+        if (!$includeUnavailableProducts) {
+            $qb->andWhere('p.available = TRUE');
+        }
+
+        $query = $qb->getQuery();
+
+        return $query->execute();
+
+        // to get just one result:
+        // $product = $query->setMaxResults(1)->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return Product[] Returns an array of Product objects
 //     */
