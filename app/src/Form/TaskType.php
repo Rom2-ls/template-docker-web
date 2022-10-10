@@ -3,18 +3,21 @@
 namespace App\Form;
 
 use App\Entity\Task;
-use Doctrine\DBAL\Types\DateType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\DateTime;
+
 
 class TaskType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('task', StringType::class)
+            ->add('task', TextType::class)
             ->add('dueDate', DateType::class, ['required'=>$options['require_due_date'], 'label'=>'To Be Completed Before'])
             ->add('save', SubmitType::class)
         ;
@@ -24,6 +27,7 @@ class TaskType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Task::class,
+            'require_due_date' => false,
         ]);
     }
 }
