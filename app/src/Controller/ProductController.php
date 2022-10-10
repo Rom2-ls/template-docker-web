@@ -12,6 +12,16 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ProductController extends AbstractController
 {
+    #[Route('/product', name: 'product_list')]
+    public function showall(ManagerRegistry $doctrine): Response
+    {
+        $products = $doctrine->getRepository(Product::class)->findAll();
+
+        return $this->render('product/list.html.twig', [
+            'products' => $products,
+        ]);
+    }
+
     #[Route('/product/{id}', name: 'product_show')]
     public function show(Product $product, int $id): Response
     {
@@ -28,7 +38,7 @@ class ProductController extends AbstractController
         // return $this->render('product/show.html.twig', ['product' => $product]);
     }
 
-    #[Route('/product/new/{name}', name: 'create_product')]
+    #[Route('/product/new/{name}', name: 'product_create')]
     public function createProduct(ManagerRegistry $doctrine, string $name): Response
     {
         $entityManager = $doctrine->getManager();
