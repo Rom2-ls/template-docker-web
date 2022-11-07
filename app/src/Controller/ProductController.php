@@ -1,18 +1,16 @@
 <?php
-
 namespace App\Controller;
 
 use App\Entity\Product;
-use App\Repository\ProductRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
+#[Route('/prd',)]
 class ProductController extends AbstractController
 {
-    #[Route('/product', name: 'product_list')]
+    #[Route('/', name: 'product_list')]
     public function showall(ManagerRegistry $doctrine): Response
     {
         $products = $doctrine->getRepository(Product::class)->findAll();
@@ -22,7 +20,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{id}', name: 'product_show')]
+    #[Route('/{id}', name: 'product_show')]
     public function show(Product $product, int $id): Response
     {
         if (!$product) {
@@ -31,14 +29,12 @@ class ProductController extends AbstractController
             );
         }
 
-        return new Response('Check out this great product: '.$product->getName());
-
-        // or render a template
-        // in the template, print things with {{ product.name }}
-        // return $this->render('product/show.html.twig', ['product' => $product]);
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
+        ]);
     }
 
-    #[Route('/product/new/{name}', name: 'product_create')]
+    #[Route('/new/{name}', name: 'product_create')]
     public function createProduct(ManagerRegistry $doctrine, string $name): Response
     {
         $entityManager = $doctrine->getManager();
@@ -57,11 +53,12 @@ class ProductController extends AbstractController
         return new Response('Saved new product with id '.$product->getId().' name : '.$product->getName());
     }
 
-    #[Route('/product/edit/{id}', name: 'product_edit')]
-    public function update(ManagerRegistry $doctrine, int $id): Response
+    #[Route('/edit/{id}/{new_name}', name: 'product_edit')]
+    public function update(ManagerRegistry $doctrine, int $id, string $new_name): Response
     {
         $entityManager = $doctrine->getManager();
-        $product = $entityManager->getRepository(Product::class)->find($id);
+        //$product = $entityManager->getRepository(Product::class)->find($id);
+        $product = $doctrine->getRepository(Product::class)->find($id);
 
         if (!$product) {
             throw $this->createNotFoundException(
@@ -69,7 +66,7 @@ class ProductController extends AbstractController
             );
         }
 
-        $product->setName('New product name!');
+        $product->setName($new_name);
         $entityManager->flush();
 
         return $this->redirectToRoute('product_show', [

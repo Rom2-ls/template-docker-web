@@ -1,3 +1,25 @@
-{% for product in products %}
-    {{ product.name }}<br/>
-{% endfor %}
+{% extends "base.html.twig" %}
+
+{% block title %}product list{% endblock %}
+
+{% block body %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">label</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td><a href="{{ path('product_show', {id: product.id }) }}" class="btn btn-primary">product info</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/new/">new product</a>
+{% endblock %}

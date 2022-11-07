@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block title %}product n° {{ product.id }}{% endblock %}
+
+{% block body %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">label</th>
+                <th scope="col">description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.description }}</td>
+        </tbody>
+    </table>
+    <a href="/product">return</a>
+{% endblock %}
