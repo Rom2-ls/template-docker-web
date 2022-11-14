@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Product;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,9 +14,7 @@ class ProductType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('price')
-            ->add('description')
-        ;
+            ->add('price');
     }
 
     public function configureOptions(OptionsResolver $resolver): void

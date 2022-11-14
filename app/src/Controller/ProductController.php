@@ -1,76 +1,78 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\Product;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Form\ProductType;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/prd',)]
+#[Route('/product')]
 class ProductController extends AbstractController
 {
-    #[Route('/', name: 'product_list')]
-    public function showall(ManagerRegistry $doctrine): Response
+    #[Route('/', name: 'app_product_index', methods: ['GET'])]
+    public function index(ProductRepository $productRepository): Response
     {
-        $products = $doctrine->getRepository(Product::class)->findAll();
-
-        return $this->render('product/list.html.twig', [
-            'products' => $products,
+        return $this->render('product/index.html.twig', [
+            'products' => $productRepository->findAll(),
         ]);
     }
 
-    #[Route('/{id}', name: 'product_show')]
-    public function show(Product $product, int $id): Response
+    #[Route('/new', name: 'app_product_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, ProductRepository $productRepository): Response
     {
-        if (!$product) {
-            throw $this->createNotFoundException(
-                'No product found for id '.$id
-            );
+        $product = new Product();
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $productRepository->save($product, true);
+
+            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        return $this->renderForm('product/new.html.twig', [
+            'product' => $product,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
+    public function show(Product $product): Response
+    {
         return $this->render('product/show.html.twig', [
             'product' => $product,
         ]);
     }
 
-    #[Route('/new/{name}', name: 'product_create')]
-    public function createProduct(ManagerRegistry $doctrine, string $name): Response
+    #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Product $product, ProductRepository $productRepository): Response
     {
-        $entityManager = $doctrine->getManager();
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
 
-        $product = new Product();
-        $product->setName($name);
-        $product->setPrice(1999);
-        $product->setDescription('Ergonomic and stylish!');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $productRepository->save($product, true);
 
-        // tell Doctrine you want to (eventually) save the Product (no queries yet)
-        $entityManager->persist($product);
-
-        // actually executes the queries (i.e. the INSERT query)
-        $entityManager->flush();
-
-        return new Response('Saved new product with id '.$product->getId().' name : '.$product->getName());
-    }
-
-    #[Route('/edit/{id}/{new_name}', name: 'product_edit')]
-    public function update(ManagerRegistry $doctrine, int $id, string $new_name): Response
-    {
-        $entityManager = $doctrine->getManager();
-        //$product = $entityManager->getRepository(Product::class)->find($id);
-        $product = $doctrine->getRepository(Product::class)->find($id);
-
-        if (!$product) {
-            throw $this->createNotFoundException(
-                'No product found for id '.$id
-            );
+            return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        $product->setName($new_name);
-        $entityManager->flush();
-
-        return $this->redirectToRoute('product_show', [
-            'id' => $product->getId()
+        return $this->renderForm('product/edit.html.twig', [
+            'product' => $product,
+            'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}', name: 'app_product_delete', methods: ['POST'])]
+    public function delete(Request $request, Product $product, ProductRepository $productRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
+            $productRepository->remove($product, true);
+        }
+
+        return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
     }
 }
