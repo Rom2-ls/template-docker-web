@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class ProductController extends AbstractController
 {
@@ -23,7 +24,9 @@ class ProductController extends AbstractController
     #[Route('/product/new', name: 'app_product_new', methods: ['GET', 'POST'])]
     public function new(Request $request, ProductRepository $productRepository): Response
     {
+        $user = $this->getUser();
         $product = new Product();
+        $product->setCreator($user);
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
@@ -74,4 +77,34 @@ class ProductController extends AbstractController
 
         return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    // ADMIN PART
+
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/admin', name: 'app_admin_product_index', methods: ['GET'])]
+    public function admin_index(ProductRepository $productRepository): Response
+    {
+        return $this->render('product/index.html.twig', [
+            'products' => $productRepository->findAll(),
+        ]);
+    }
+
+    #[Route('admin/product/{id}', name: 'app_admin_product_show', methods: ['GET'])]
+    public function admin_show(Product $product): Response
+    {
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
+        ]);
+    }
+
+    #[Route('admin/product/{id}', name: 'app_admin_product_delete', methods: ['POST'])]
+    public function admin_delete(Request $request, Product $product, ProductRepository $productRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->request->get('_token'))) {
+            $productRepository->remove($product, true);
+        }
+
+        return $this->redirectToRoute('app_admin_product_index', [], Response::HTTP_SEE_OTHER);
+    }
+
 }
