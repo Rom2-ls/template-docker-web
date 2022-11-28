@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product index{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>Product index</h1>
+
+        <table class="table table-bordered table-dark">
+            <thead class="">
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Creator</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.creator.id }}</td>
+                    <td>
+                        <a class="btn btn-primary" href="{{ path('app_admin_product_show', {'id': product.id}) }}">show</a>
+                        <a class="btn btn-warning" href="{{ path('app_admin_product_edit', {'id': product.id}) }}">edit</a>
+                        <a class="btn btn-danger" href="{{ path('app_admin_product_delete', {'id': product.id}) }}">delete</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a class="btn btn-success" href="{{ path('app_admin_product_new') }}">Create new</a>
+    </div>
+{% endblock %}
