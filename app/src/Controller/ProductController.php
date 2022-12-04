@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Product;
 use App\Form\ProductType;
 use App\Repository\ProductRepository;
-use Doctrine\ORM\Query\AST\WhereClause;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -88,7 +87,7 @@ class ProductController extends AbstractController
     // ADMIN PART
 
     #[IsGranted('ROLE_ADMIN')]
-    #[Route('/admin', name: 'app_admin_product_index', methods: ['GET'])]
+    #[Route('/admin/product', name: 'app_admin_product_index', methods: ['GET'])]
     public function admin_index(ProductRepository $productRepository): Response
     {
         return $this->render('admin/product/index.html.twig', [
