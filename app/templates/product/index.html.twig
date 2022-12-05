@@ -12,7 +12,6 @@
                     <th>Id</th>
                     <th>Name</th>
                     <th>Price</th>
-                    <th>Creator</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -22,7 +21,6 @@
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
                     <td>{{ product.price }}</td>
-                    <td>{{ product.creator.id }}</td>
                     <td>
                         <a class="btn btn-primary" href="{{ path('app_product_show', {'id': product.id}) }}">show</a>
                         <a class="btn btn-warning" href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
